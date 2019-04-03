@@ -10,37 +10,10 @@ GAME RULES:
 */
 
 
-var scores, roundScore, activePlayer;
+var scores, roundScore, activePlayer, gamePlaying;
 
-scores = [0, 0];//scores for each player stored in an array
-roundScore = 0;//score for the current round
-activePlayer = 1;//active player - [0] = Player 1 [1] = Player 2
-
-//dice = Math.floor(Math.random() * 6) + 1;	//random number between 0 and 1 multiplied by 6, rounded down to nearest whole number then 1 is added
-
-//.querySelector selects elements using CSS syntax.
-//Adding activePlayer variable allows for switching between players
-//.textContent changes content of element (in this case adds dice variables value)
-//document.querySelector('#current-' + activePlayer).textContent = dice;//GETTER
-
-//.innerHTML allows HTML elements to be added. MUST USE STRING.
-//document.querySelector('#current-' + activePlayer).innerHTML = '<strong>' + dice + '</strong>';
-
-//Can use .querySelector to SET variables
-//var x = document.querySelector('#score-0').textContent;//SETTER
-//console.log(x);
-
-//.style allows you to change CSS properties. Write the property afterwards with a . (in this case display becomes .style.display). Write an = then the property AS A STRING.
-document.querySelector('.dice').style.display = 'none';
-
-//.getElementById allows you to directly select HTML elements using their ID. NO NEED FOR #. 
-document.getElementById('score-0').textContent = '0';
-document.getElementById('score-1').textContent = '0';
-document.getElementById('current-0').textContent = '0';
-document.getElementById('current-1').textContent = '0';
-
-
-
+//triggers initialization function (see below)
+init();
 
 //function btn() {
 	// Does something
@@ -54,15 +27,126 @@ document.getElementById('current-1').textContent = '0';
 //btn is a CALLBACK FUNCTION as it is called by another function/method, in this case .addEventListener
 
 //Alternatively, you can have an ANONYMOUS FUNCTION when the function is defined inside the function parameter .e.g.
+//When ROLL DICE button is clicked
 document.querySelector('.btn-roll').addEventListener('click', function () {//Function has no name and therefore cannot be called outside this context
-	//1. Generate random number
-	var dice = Math.floor(Math.random() * 6) + 1;
-	
-	//2. Display the result
-	var diceDOM = document.querySelector('.dice');
-	diceDOM.style.display = 'block';
-	diceDOM.src = 'dice-' + dice + '.png';
-	//3. Update the round score IF the rolled number was NOT a 1
+	//gamePlaying is a STATE VARIABLE. In this case evaluates whether the game is playing -- true or false?
+	if (gamePlaying) {
+		//1. Generate random number
+		var dice = Math.floor(Math.random() * 6) + 1;
+		
+		//2. Display the result
+		var diceDOM = document.querySelector('.dice');
+		diceDOM.style.display = 'block';
+		diceDOM.src = 'dice-' + dice + '.png';
+		
+		//3. Update the round score IF the rolled number was NOT a 1
+		if (dice !== 1) {
+			roundScore += dice;//Add score
+			document.querySelector('#current-' + activePlayer).textContent = roundScore;
 
+		} else {
+			nextPlayer ();
+		}
+	}
+	
 });
+
+//when HOLD button is clicked
+document.querySelector('.btn-hold').addEventListener('click', function () {
+	if (gamePlaying) {
+		//1. Add current score to global score
+		scores[activePlayer] += roundScore;
+
+		//2. Update UI
+		document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+		
+		//3. Check if player won the game
+		if (scores[activePlayer] >= 20) {
+			//Changes player name to 'Winner!'
+			document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
+
+			//Remove dice image
+			document.querySelector('.dice').style.display = 'none';
+
+			//Removes .active CSS class
+			document.querySelector('.player-' + activePlayer +'-panel').classList.remove('active');
+
+			//Adds .winner CSS class
+			document.querySelector('.player-' + activePlayer +'-panel').classList.add('winner');
+
+			//Changes state of game to false
+			gamePlaying = false;
+			
+		} else {
+			//Switch to next player
+			nextPlayer();
+		}	
+	}
+});
+	
+//when NEW GAME button is clicked
+document.querySelector('.btn-new').addEventListener('click', init);//Calls back init() function
+
+
+//Game initialisation function
+function init () {
+	scores = [0, 0];//scores for each player stored in an array
+	roundScore = 0;//score for the current round
+	activePlayer = 0;//active player - [0] = Player 1 [1] = Player 2
+	gamePlaying = true;//sets state of game to true i.e. a game is being played
+
+	//dice = Math.floor(Math.random() * 6) + 1;	//random number between 0 and 1 multiplied by 6, rounded down to nearest whole number then 1 is added
+
+	//.querySelector selects elements using CSS syntax.
+	//Adding activePlayer variable allows for switching between players
+	//.textContent changes content of element (in this case adds dice variables value)
+	//document.querySelector('#current-' + activePlayer).textContent = dice;//GETTER
+
+	//.innerHTML allows HTML elements to be added. MUST USE STRING.
+	//document.querySelector('#current-' + activePlayer).innerHTML = '<strong>' + dice + '</strong>';
+
+	//Can use .querySelector to SET variables
+	//var x = document.querySelector('#score-0').textContent;//SETTER
+	//console.log(x);
+
+	//.style allows you to change CSS properties. Write the property afterwards with a . (in this case display becomes .style.display). Write an = then the property AS A STRING.
+	//Removes dice image
+	document.querySelector('.dice').style.display = 'none';
+
+	//.getElementById allows you to directly select HTML elements using their ID. NO NEED FOR #. 
+	//Resets global scores to 0
+	document.getElementById('score-0').textContent = '0';
+	document.getElementById('score-1').textContent = '0';
+	//Resets current scores to zeros
+	document.getElementById('current-0').textContent = '0';
+	document.getElementById('current-1').textContent = '0';
+	//Resets player names
+	document.getElementById('name-0').textContent = 'Player 1';
+	document.getElementById('name-1').textContent = 'Player 2';
+	//Resets panel styles by removing .active and .winner classes
+	document.querySelector('.player-0-panel').classList.remove('winner', 'active');
+	document.querySelector('.player-1-panel').classList.remove('winner', 'active');
+	//Sets up Player 1 as the first active player in a new game
+	document.querySelector('.player-0-panel').classList.add('active');
+}
+
+
+//Carries out all necessary changes when the player needs to be switched
+function nextPlayer () {
+	//Next player
+	activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
+	
+	roundScore = 0;
+	
+	//Updates HTML element to 0 so it displays on page
+	document.getElementById('current-0').textContent = 0;
+	document.getElementById('current-1').textContent = 0;
+
+	//Toggles .active CSS class to style player panels differently if they are the current player
+	document.querySelector('.player-0-panel').classList.toggle('active');
+	document.querySelector('.player-1-panel').classList.toggle('active');
+
+	//Removes dice image from centre
+	document.querySelector('.dice').style.display = 'none';
+};
 
