@@ -10,7 +10,7 @@ GAME RULES:
 */
 
 
-var scores, roundScore, activePlayer, gamePlaying;
+var scores, roundScore, activePlayer, gamePlaying, previousRoll;
 
 //triggers initialization function (see below)
 init();
@@ -25,43 +25,62 @@ init();
 //When writing function brackets are excluded because we don't want to immediately call the function, we want the event listener to call it,  e.g. btn NOT btn().
 //document.querySelector('.btn-roll').addEventListener('click', btn);
 //btn is a CALLBACK FUNCTION as it is called by another function/method, in this case .addEventListener
-
 //Alternatively, you can have an ANONYMOUS FUNCTION when the function is defined inside the function parameter .e.g.
 //When ROLL DICE button is clicked
 document.querySelector('.btn-roll').addEventListener('click', function () {//Function has no name and therefore cannot be called outside this context
 	//gamePlaying is a STATE VARIABLE. In this case evaluates whether the game is playing -- true or false?
 	if (gamePlaying) {
-		//1. Generate random number
+		//Generate random number
 		var dice = Math.floor(Math.random() * 6) + 1;
-		
-		//2. Display the result
+		// var dice = 6;
+
+		//Display the result
 		var diceDOM = document.querySelector('.dice');
 		diceDOM.style.display = 'block';
 		diceDOM.src = 'dice-' + dice + '.png';
-		
-		//3. Update the round score IF the rolled number was NOT a 1
-		if (dice !== 1) {
-			roundScore += dice;//Add score
-			document.querySelector('#current-' + activePlayer).textContent = roundScore;
 
-		} else {
-			nextPlayer ();
-		}
+		//If previous and current roll equal 6, 
+		if (previousRoll === 6 && dice === 6) {
+			//zero global score
+			scores[activePlayer] = 0;
+			document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+			nextPlayer();
+		}	else if (dice !== 1) {//Update the round score IF the rolled number was NOT a 1
+				roundScore += dice;//Add score
+				document.querySelector('#current-' + activePlayer).textContent = roundScore;
+				//Stores as previous roll for next roll
+			}
+			else {
+				//switch to next player				
+				nextPlayer ();
+			}
+		
+		
+		//stores current roll as previous roll for next click of ROLL DICE button 
+		previousRoll = dice;
 	}
-	
 });
 
 //when HOLD button is clicked
 document.querySelector('.btn-hold').addEventListener('click', function () {
 	if (gamePlaying) {
-		//1. Add current score to global score
+		//Add current score to global score
 		scores[activePlayer] += roundScore;
 
-		//2. Update UI
+		//Update UI
 		document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+
+		//Checks if there is a target score. Sets to 100 id undefined
+		var input = document.getElementById('target-score').value;
+		var winningScore;
+		if (input) {
+			winningScore = input;
+		}	else {
+				winningScore = 100;
+		}
 		
-		//3. Check if player won the game
-		if (scores[activePlayer] >= 20) {
+		//Check if player won the game
+		if (scores[activePlayer] >= winningScore) {
 			//Changes player name to 'Winner!'
 			document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
 
@@ -150,3 +169,11 @@ function nextPlayer () {
 	document.querySelector('.dice').style.display = 'none';
 };
 
+/*
+YOUR 3 CHALLENGES
+Change the game to follow these rules:
+
+1. A player looses his ENTIRE score when he rolls two 6 in a row. After that, it's the next player's turn. (Hint: Always save the previous dice roll in a separate variable)
+2. Add an input field to the HTML where players can set the winning score, so that they can change the predefined score of 100. (Hint: you can read that value with the .value property in JavaScript. This is a good oportunity to use google to figure this out :)
+3. Add another dice to the game, so that there are two dices now. The player looses his current score when one of them is a 1. (Hint: you will need CSS to position the second dice, so take a look at the CSS code for the first one.)
+*/
