@@ -4,19 +4,11 @@ A simple dice game of luck and strategy
 /*
 GAME RULES:
 
-- The game has 2 players, playing in rounds
-- In each turn, a player rolls a dice as many times as he wishes. Each result gets added to his ROUND score
-- BUT, if the player rolls a 1, all his ROUND score gets lost. After that, it's the next player's turn
-- The player can choose to 'Hold', which means that his ROUND score gets added to his GLBAL score. After that, it's the next player's turn
-- The first player to reach 100 points on GLOBAL score wins the game
+- The game has 2 players, playing in rounds.
+- In each turn, a player rolls two dice as many times as they wish. Each result gets added to his CURRENT score.
+- BUT, if the player rolls a 1 with the top dice, all his ROUND score gets lost. After that, it's the next player's turn.
+- The player loses both their CURRENT and GLOBAL scores if they roll two sixes in a row on EITHER dice.
+- The player can choose to HOLD, which means that his ROUND score gets added to his GLOBAL score. After that, it's the next player's turn
+- The first player to reach 100 points in their GLOBAL score wins the game by default. However, this can be altered to a custom amount using the SET TARGET SCORE box.
 
-*/
-
-/*
-YOUR 3 CHALLENGES
-Change the game to follow these rules:
-
-1. A player looses his ENTIRE score when he rolls two 6 in a row. After that, it's the next player's turn. (Hint: Always save the previous dice roll in a separate variable)
-2. Add an input field to the HTML where players can set the winning score, so that they can change the predefined score of 100. (Hint: you can read that value with the .value property in JavaScript. This is a good oportunity to use google to figure this out :)
-3. Add another dice to the game, so that there are two dices now. The player looses his current score when one of them is a 1. (Hint: you will need CSS to position the second dice, so take a look at the CSS code for the first one.)
 */
