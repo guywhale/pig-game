@@ -10,7 +10,7 @@ GAME RULES:
 */
 
 
-var scores, roundScore, activePlayer, gamePlaying, previousRoll;
+var scores, roundScore, activePlayer, gamePlaying, previousRoll0, previousRoll1;
 
 //triggers initialization function (see below)
 init();
@@ -26,27 +26,33 @@ init();
 //document.querySelector('.btn-roll').addEventListener('click', btn);
 //btn is a CALLBACK FUNCTION as it is called by another function/method, in this case .addEventListener
 //Alternatively, you can have an ANONYMOUS FUNCTION when the function is defined inside the function parameter .e.g.
+
 //When ROLL DICE button is clicked
 document.querySelector('.btn-roll').addEventListener('click', function () {//Function has no name and therefore cannot be called outside this context
 	//gamePlaying is a STATE VARIABLE. In this case evaluates whether the game is playing -- true or false?
 	if (gamePlaying) {
 		//Generate random number
-		var dice = Math.floor(Math.random() * 6) + 1;
-		// var dice = 6;
+		var dice0 = Math.floor(Math.random() * 6) + 1;
+		// var dice0 = 6;
+		var dice1 = Math.floor(Math.random() * 6) + 1;
 
 		//Display the result
-		var diceDOM = document.querySelector('.dice');
+		var diceDOM = document.querySelector('#dice-0');
 		diceDOM.style.display = 'block';
-		diceDOM.src = 'dice-' + dice + '.png';
+		diceDOM.src = 'dice-' + dice0 + '.png';
 
-		//If previous and current roll equal 6, 
-		if (previousRoll === 6 && dice === 6) {
+		var diceDOM = document.querySelector('#dice-1');
+		diceDOM.style.display = 'block';
+		diceDOM.src = 'dice-' + dice1 + '.png';
+
+		//If previous and current rolls on either top dice or bottom dice equal 6, 
+		if ((previousRoll0 === 6 && dice0 === 6) || (previousRoll1 === 6 && dice1 === 6)) {
 			//zero global score
 			scores[activePlayer] = 0;
 			document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
 			nextPlayer();
-		}	else if (dice !== 1) {//Update the round score IF the rolled number was NOT a 1
-				roundScore += dice;//Add score
+		}	else if (dice0 !== 1) {//Update the round score IF the top dice number was NOT a 1
+				roundScore += (dice0 + dice1);//Add score
 				document.querySelector('#current-' + activePlayer).textContent = roundScore;
 				//Stores as previous roll for next roll
 			}
@@ -54,10 +60,10 @@ document.querySelector('.btn-roll').addEventListener('click', function () {//Fun
 				//switch to next player				
 				nextPlayer ();
 			}
-		
-		
+
 		//stores current roll as previous roll for next click of ROLL DICE button 
-		previousRoll = dice;
+		previousRoll0 = dice0;
+		previousRoll1 = dice1;
 	}
 });
 
@@ -84,8 +90,9 @@ document.querySelector('.btn-hold').addEventListener('click', function () {
 			//Changes player name to 'Winner!'
 			document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
 
-			//Remove dice image
-			document.querySelector('.dice').style.display = 'none';
+			//Remove dice images
+			document.querySelector('#dice-0').style.display = 'none';
+			document.querySelector('#dice-1').style.display = 'none';
 
 			//Removes .active CSS class
 			document.querySelector('.player-' + activePlayer +'-panel').classList.remove('active');
@@ -130,7 +137,8 @@ function init () {
 
 	//.style allows you to change CSS properties. Write the property afterwards with a . (in this case display becomes .style.display). Write an = then the property AS A STRING.
 	//Removes dice image
-	document.querySelector('.dice').style.display = 'none';
+	document.querySelector('#dice-0').style.display = 'none';
+	document.querySelector('#dice-1').style.display = 'none';
 
 	//.getElementById allows you to directly select HTML elements using their ID. NO NEED FOR #. 
 	//Resets global scores to 0
@@ -155,7 +163,12 @@ function nextPlayer () {
 	//Next player
 	activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
 	
+	//Resets current score to 0
 	roundScore = 0;
+
+	//Resets previous rolls so no 6 carries over from previous round
+	// previousRoll0 = 0;
+	// previousRoll1 = 0;
 	
 	//Updates HTML element to 0 so it displays on page
 	document.getElementById('current-0').textContent = 0;
@@ -165,8 +178,9 @@ function nextPlayer () {
 	document.querySelector('.player-0-panel').classList.toggle('active');
 	document.querySelector('.player-1-panel').classList.toggle('active');
 
-	//Removes dice image from centre
-	document.querySelector('.dice').style.display = 'none';
+	//Removes dice images from centre
+	document.querySelector('#dice-0').style.display = 'none';
+	document.querySelector('#dice-1').style.display = 'none';
 };
 
 /*
