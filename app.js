@@ -10,7 +10,7 @@ GAME RULES:
 */
 
 
-var scores, roundScore, activePlayer, gamePlaying;
+var scores, roundScore, activePlayer, gamePlaying, previousRoll0, previousRoll1;
 
 //triggers initialization function (see below)
 init();
@@ -25,48 +25,74 @@ init();
 //When writing function brackets are excluded because we don't want to immediately call the function, we want the event listener to call it,  e.g. btn NOT btn().
 //document.querySelector('.btn-roll').addEventListener('click', btn);
 //btn is a CALLBACK FUNCTION as it is called by another function/method, in this case .addEventListener
-
 //Alternatively, you can have an ANONYMOUS FUNCTION when the function is defined inside the function parameter .e.g.
+
 //When ROLL DICE button is clicked
 document.querySelector('.btn-roll').addEventListener('click', function () {//Function has no name and therefore cannot be called outside this context
 	//gamePlaying is a STATE VARIABLE. In this case evaluates whether the game is playing -- true or false?
 	if (gamePlaying) {
-		//1. Generate random number
-		var dice = Math.floor(Math.random() * 6) + 1;
-		
-		//2. Display the result
-		var diceDOM = document.querySelector('.dice');
-		diceDOM.style.display = 'block';
-		diceDOM.src = 'dice-' + dice + '.png';
-		
-		//3. Update the round score IF the rolled number was NOT a 1
-		if (dice !== 1) {
-			roundScore += dice;//Add score
-			document.querySelector('#current-' + activePlayer).textContent = roundScore;
+		//Generate random number
+		var dice0 = Math.floor(Math.random() * 6) + 1;
+		// var dice0 = 6;
+		var dice1 = Math.floor(Math.random() * 6) + 1;
 
-		} else {
-			nextPlayer ();
-		}
+		//Display the result
+		var diceDOM = document.querySelector('#dice-0');
+		diceDOM.style.display = 'block';
+		diceDOM.src = 'dice-' + dice0 + '.png';
+
+		var diceDOM = document.querySelector('#dice-1');
+		diceDOM.style.display = 'block';
+		diceDOM.src = 'dice-' + dice1 + '.png';
+
+		//If previous and current rolls on either top dice or bottom dice equal 6, 
+		if ((previousRoll0 === 6 && dice0 === 6) || (previousRoll1 === 6 && dice1 === 6)) {
+			//zero global score
+			scores[activePlayer] = 0;
+			document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+			nextPlayer();
+		}	else if (dice0 !== 1) {//Update the round score IF the top dice number was NOT a 1
+				roundScore += (dice0 + dice1);//Add score
+				document.querySelector('#current-' + activePlayer).textContent = roundScore;
+				//Stores as previous roll for next roll
+			}
+			else {
+				//switch to next player				
+				nextPlayer ();
+			}
+
+		//stores current roll as previous roll for next click of ROLL DICE button 
+		previousRoll0 = dice0;
+		previousRoll1 = dice1;
 	}
-	
 });
 
 //when HOLD button is clicked
 document.querySelector('.btn-hold').addEventListener('click', function () {
 	if (gamePlaying) {
-		//1. Add current score to global score
+		//Add current score to global score
 		scores[activePlayer] += roundScore;
 
-		//2. Update UI
+		//Update UI
 		document.querySelector('#score-' + activePlayer).textContent = scores[activePlayer];
+
+		//Checks if there is a target score. Sets to 100 id undefined
+		var input = document.getElementById('target-score').value;
+		var winningScore;
+		if (input) {
+			winningScore = input;
+		}	else {
+				winningScore = 100;
+		}
 		
-		//3. Check if player won the game
-		if (scores[activePlayer] >= 20) {
+		//Check if player won the game
+		if (scores[activePlayer] >= winningScore) {
 			//Changes player name to 'Winner!'
 			document.querySelector('#name-' + activePlayer).textContent = 'Winner!';
 
-			//Remove dice image
-			document.querySelector('.dice').style.display = 'none';
+			//Remove dice images
+			document.querySelector('#dice-0').style.display = 'none';
+			document.querySelector('#dice-1').style.display = 'none';
 
 			//Removes .active CSS class
 			document.querySelector('.player-' + activePlayer +'-panel').classList.remove('active');
@@ -111,7 +137,8 @@ function init () {
 
 	//.style allows you to change CSS properties. Write the property afterwards with a . (in this case display becomes .style.display). Write an = then the property AS A STRING.
 	//Removes dice image
-	document.querySelector('.dice').style.display = 'none';
+	document.querySelector('#dice-0').style.display = 'none';
+	document.querySelector('#dice-1').style.display = 'none';
 
 	//.getElementById allows you to directly select HTML elements using their ID. NO NEED FOR #. 
 	//Resets global scores to 0
@@ -136,7 +163,12 @@ function nextPlayer () {
 	//Next player
 	activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
 	
+	//Resets current score to 0
 	roundScore = 0;
+
+	//Resets previous rolls so no 6 carries over from previous round
+	// previousRoll0 = 0;
+	// previousRoll1 = 0;
 	
 	//Updates HTML element to 0 so it displays on page
 	document.getElementById('current-0').textContent = 0;
@@ -146,7 +178,16 @@ function nextPlayer () {
 	document.querySelector('.player-0-panel').classList.toggle('active');
 	document.querySelector('.player-1-panel').classList.toggle('active');
 
-	//Removes dice image from centre
-	document.querySelector('.dice').style.display = 'none';
+	//Removes dice images from centre
+	document.querySelector('#dice-0').style.display = 'none';
+	document.querySelector('#dice-1').style.display = 'none';
 };
 
+/*
+YOUR 3 CHALLENGES
+Change the game to follow these rules:
+
+1. A player looses his ENTIRE score when he rolls two 6 in a row. After that, it's the next player's turn. (Hint: Always save the previous dice roll in a separate variable)
+2. Add an input field to the HTML where players can set the winning score, so that they can change the predefined score of 100. (Hint: you can read that value with the .value property in JavaScript. This is a good oportunity to use google to figure this out :)
+3. Add another dice to the game, so that there are two dices now. The player looses his current score when one of them is a 1. (Hint: you will need CSS to position the second dice, so take a look at the CSS code for the first one.)
+*/

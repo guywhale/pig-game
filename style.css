@@ -144,11 +144,45 @@ i {
 .dice {
     position: absolute;
     left: 50%;
-    top: 178px;
     transform: translateX(-50%);
     height: 100px;
     box-shadow: 0px 10px 60px rgba(0, 0, 0, 0.10);
 }
 
+#dice-0 {
+    top: 128px;
+}
+
+#dice-1 {
+    top: 260px;
+}
+
 .winner { background-color: #f7f7f7; }
 .winner .player-name { font-weight: 300; color: #EB4D4D; }
+
+.t-score {
+    position: absolute;
+    width: 380px;
+    left: 5%;
+    color: #555;
+    font-family: Lato;
+    font-size: 20px;
+    text-transform: uppercase;
+    font-weight: 300;
+    top: 45px;
+}
+
+.t-score p {
+    width: 50%;
+    display: inline-block;
+}
+
+input {
+    margin-left: 10px;
+    text-align: center;
+    height: 30px;
+    font-family: Lato;
+    font-size: 20px;
+    width: 15%;
+    display: inline-block;
+}
